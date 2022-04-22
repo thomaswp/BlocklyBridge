@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="bin.meta" />
+    <None Remove="BlocklyAttributes.cs.meta" />
+    <None Remove="BlocklyBridge.cs.meta" />
+    <None Remove="BlocklyBridge.csproj.meta" />
+    <None Remove="BlocklyGenerator.cs.meta" />
+    <None Remove="Class1.cs.meta" />
+    <None Remove="Debug.cs.meta" />
+    <None Remove="obj.meta" />
+    <None Remove="WebsocketServer.cs.meta" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\JsonDotNet\Assemblies\Windows\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
