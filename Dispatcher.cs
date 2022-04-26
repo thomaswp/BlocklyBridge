@@ -127,6 +127,7 @@ namespace BlocklyBridge
             }
 
             var method = BlocklyGenerator.Call(target, methodName, args);
+            if (method != null) target.EnqueueMethod(method);
             Action onFinished = () =>
             {
                 WebsocketServer.SendMessage(new JsonMessage("BlockFinished", new
