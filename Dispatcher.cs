@@ -37,9 +37,9 @@ namespace BlocklyBridge
 
         private Dictionary<string, IProgrammable> programmableMap = new Dictionary<string, IProgrammable>();
 
-        public void Start(Action onConnected)
+        public void Start(Type[] types, Action onConnected)
         {
-            JsonMessage blocksJSON = BlocklyGenerator.GenerateBlocks();
+            JsonMessage blocksJSON = BlocklyGenerator.GenerateBlocks(types);
 
             websocket = WebsocketServer.Start(url, port);
             WebsocketServer.OnMessage += WebsocketServer_OnMessage;
@@ -71,6 +71,7 @@ namespace BlocklyBridge
             if (websocket == null) return;
             // TODO: Should probably only send relevant data
             WebsocketServer.SendMessage(new JsonMessage("SyncCode", State.Programs));
+            //Logger.Log($"Sending {State.Programs.Count} programs");
         }
 
         private void WebsocketServer_OnMessage(string dataString)
@@ -107,7 +108,8 @@ namespace BlocklyBridge
             string targetID = (string)data["targetID"];
             string codeXML = (string)data["code"];
             State.GetProgram(targetID).Code = codeXML;
-            OnSave.Invoke(State);
+            //Logger.Log($"Setting {targetID} to {codeXML}");
+            if (OnSave != null) OnSave.Invoke(State);
         }
 
         private void RunMethod(JObject data)
@@ -125,14 +127,13 @@ namespace BlocklyBridge
             }
 
             var method = BlocklyGenerator.Call(target, methodName, args);
-            object returnValue = method == null ? null : method.GetReturnValue();
             Action onFinished = () =>
             {
                 WebsocketServer.SendMessage(new JsonMessage("BlockFinished", new
                 {
-                    targetID = targetID,
-                    threadID = threadID,
-                    returnValue = returnValue,
+                    targetID,
+                    threadID,
+                    returnValue = method?.GetReturnValue(),
                 }));
             };
             if (method == null)

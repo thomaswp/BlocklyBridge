@@ -9,15 +9,15 @@ namespace BlocklyBridge
     {
         static Dictionary<string, MethodInfo> methodMap, eventMap;
 
-        public static JsonMessage GenerateBlocks()
+        public static JsonMessage GenerateBlocks(Type[] types)
         {
             methodMap = new Dictionary<string, MethodInfo>();
             eventMap = new Dictionary<string, MethodInfo>();
 
-            var q = from t in Assembly.GetExecutingAssembly().GetTypes()
-                    where t.IsClass && t.Namespace == "Farmbot"
+            var scriptables = from t in types
+                    where t.IsClass && Attribute.IsDefined(t, typeof(ScriptableBehavior))
                     select t;
-            var scriptables = q.Where(t => Attribute.IsDefined(t, typeof(ScriptableBehavior)));
+
 
             BlocklyDefinitions definitions = new BlocklyDefinitions();
 
@@ -111,7 +111,7 @@ namespace BlocklyBridge
             return async;
         }
 
-        internal static void SendEvent(IProgrammable target, string eventName)
+        public static void SendEvent(IProgrammable target, string eventName)
         {
             string id = target.GetGuid();
             WebsocketServer.SendMessage(new JsonMessage("TriggerEvent", new
