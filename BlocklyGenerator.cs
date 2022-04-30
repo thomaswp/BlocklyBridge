@@ -221,6 +221,8 @@ namespace BlocklyBridge
 
     public class AsyncMethod
     {
+        public static readonly AsyncMethod NoOp = new AsyncMethod();
+
         protected List<Func<bool>> todo = new List<Func<bool>>();
 
         public string BlockingCategory { get; private set; }
@@ -243,6 +245,18 @@ namespace BlocklyBridge
                 action();
                 return true;
             });
+            return this;
+        }
+
+        public AsyncMethod Do(AsyncMethod action)
+        {
+            todo.AddRange(action.todo);
+            return this;
+        }
+
+        public AsyncMethod Wait(int frames)
+        {
+            todo.Add(() => frames-- <= 0);
             return this;
         }
 
