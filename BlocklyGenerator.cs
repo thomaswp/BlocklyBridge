@@ -99,12 +99,32 @@ namespace BlocklyBridge
                 {
                     args[i] = arg = Enum.Parse(paramType, (string)arg);
                 }
-                var argType = arg == null ? typeof(object) : arg.GetType();
-                if (!paramType.IsAssignableFrom(argType))
+                
+                if (arg == null && paramType.IsPrimitive)
                 {
-                    Logger.Log($"For arg {i} of {name}: cannot assign {argType} {arg} to {paramType}");
-                    return null;
+                    // Should be able to convert 0 to most primitives
+                    arg = 0;
                 }
+
+                if (arg != null) {
+                    var argType = arg.GetType();
+                    // If the arg can't already be passed...
+                    if (!paramType.IsAssignableFrom(argType))
+                    {
+                        try
+                        {
+                            // Try converting it (e.g. long => int)
+                            arg = Convert.ChangeType(arg, paramType);
+                        }
+                        catch
+                        {
+                            Logger.Log($"For arg {i} of {name}: cannot assign {argType} {arg} to {paramType}");
+                            return null;
+                        }
+                    }
+                }
+
+                args[i] = arg;
             }
             object component = target.GetObjectForType(method.DeclaringType);
             AsyncMethod async = (AsyncMethod) method.Invoke(component, args);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 
 namespace BlocklyBridge
 {
@@ -17,6 +18,16 @@ namespace BlocklyBridge
             program = new Program() { Guid = guid };
             Programs.Add(program);
             return program;
+        }
+
+        public string ToJSON()
+        {
+            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IncludeFields = true });
+        }
+
+        public static ProgramState FromJSON(string json)
+        {
+            return (ProgramState)JsonSerializer.Deserialize(json, typeof(ProgramState), new JsonSerializerOptions { IncludeFields = true });
         }
     }
 

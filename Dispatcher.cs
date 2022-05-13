@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace BlocklyBridge
 {
-    public class Dispatcher
+    public class Dispatcher : IDisposable
     {
         public readonly string url;
         public readonly int port;
@@ -89,6 +89,11 @@ namespace BlocklyBridge
                 return;
             }
             enqueueAction(() => HandleMessage(data));
+        }
+
+        public void Dispose()
+        {
+            websocket.Stop();
         }
 
         private void HandleMessage(JObject message)

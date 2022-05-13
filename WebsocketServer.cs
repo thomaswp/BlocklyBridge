@@ -33,6 +33,7 @@ namespace BlocklyBridge
         private ConcurrentQueue<string> messages = new ConcurrentQueue<string>();
 
         private bool connected = false;
+        private bool stopping = false;
 
         public static WebsocketServer Start(string url, int port)
         {
@@ -64,7 +65,7 @@ namespace BlocklyBridge
                 server.Start();
                 Logger.Log("Server has started.\nWaiting for a connection...");
 
-                while (true)
+                while (!stopping)
                 {
                     connected = false;
                     TcpClient client = server.AcceptTcpClient();
@@ -74,11 +75,11 @@ namespace BlocklyBridge
 
                     stream = client.GetStream();
 
-                    while (client.Connected)
+                    while (!stopping && client.Connected)
                     {
                         Thread.Sleep(0);
 
-                        while (!messages.IsEmpty)
+                        while (!stopping && !messages.IsEmpty)
                         {
                             string message;
                             if (messages.TryDequeue(out message))
@@ -210,6 +211,7 @@ namespace BlocklyBridge
         {
             try
             {
+                stopping = true;
                 thread.Abort();
                 server.Stop();
                 Logger.Log("Server stopped");
