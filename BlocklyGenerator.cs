@@ -219,7 +219,7 @@ namespace BlocklyBridge
         {
             this.type = type.Name;
 
-            if (type.IsPrimitive)
+            if (type.IsPrimitive || type == typeof(string) || type == typeof(object))
             {
                 isEnum = false;
                 options = null;

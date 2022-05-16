@@ -192,14 +192,25 @@ namespace BlocklyBridge
                 if (remaining > 125) opcode &= 0b01111111;
                 byte[] header = new byte[] { opcode, length };
                 //Debug.Log("Sending header: " + string.Join(",", header));
-                stream.Write(header, 0, header.Length);
-                stream.Write(messageBytes, offset, length);
-                //Debug.Log(offset + "/" + messageBytes.Length);
-                offset += length;
-                continuation = true;
+                try
+                {
+                    stream.Write(header, 0, header.Length);
+                    stream.Write(messageBytes, offset, length);
+                    //Debug.Log(offset + "/" + messageBytes.Length);
+                    offset += length;
+                    continuation = true;
+                } catch
+                {
+                    Logger.Warn("Error writing to stream; dropping message.");
+                    break;
+                }
             }
-            
-            stream.Flush();
+
+            try
+            {
+                stream.Flush();
+            }
+            catch { }
         }
 
         public static void StopInstance()

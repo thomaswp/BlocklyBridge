@@ -58,11 +58,13 @@ namespace BlocklyBridge
 
         public void SetTarget(IProgrammable programmable)
         {
+            var program = State.GetProgram(programmable.GetGuid());
             WebsocketServer.SendMessage(new JsonMessage("SetTarget", new
             {
                 targetID = programmable.GetGuid(),
                 targetName = programmable.GetName(),
-                code = State.GetProgram(programmable.GetGuid()).Code,
+                code = program.Code,
+                varMap = program.VarMap,
             }));
         }
 
@@ -112,7 +114,10 @@ namespace BlocklyBridge
         {
             string targetID = (string)data["targetID"];
             string codeXML = (string)data["code"];
-            State.GetProgram(targetID).Code = codeXML;
+            string varMapJSON = (string)data["varMap"];
+            var program = State.GetProgram(targetID);
+            program.Code = codeXML;
+            program.VarMap = varMapJSON;
             //Logger.Log($"Setting {targetID} to {codeXML}");
             if (OnSave != null) OnSave.Invoke(State);
         }

@@ -36,5 +36,6 @@ namespace BlocklyBridge
     {
         public string Guid;
         public string Code;
+        public string VarMap;
     }
 }
