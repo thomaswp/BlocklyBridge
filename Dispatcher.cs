@@ -53,7 +53,18 @@ namespace BlocklyBridge
 
         public void Register(IProgrammable programmable)
         {
-            programmableMap.Add(programmable.GetGuid(), programmable);
+            string guid = programmable.GetGuid();
+            if (programmableMap.ContainsKey(guid))
+            {
+                Logger.Warn("Replacing duplicate GUID!: " + guid);
+                Unregister(programmable);
+            }
+            programmableMap.Add(guid, programmable);
+        }
+
+        public void Unregister(IProgrammable programmable)
+        {
+            programmableMap.Remove(programmable.GetGuid());
         }
 
         public void SetTarget(IProgrammable programmable)
