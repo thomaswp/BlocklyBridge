@@ -12,5 +12,6 @@ namespace BlocklyBridge
         string GetName();
         object GetObjectForType(Type declaringType);
         void EnqueueMethod(AsyncMethod method);
+        bool TryTestCode();
     }
 }

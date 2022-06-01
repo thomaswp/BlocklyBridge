@@ -22,6 +22,8 @@ namespace BlocklyBridge
             }
         }
 
+        public IProgrammable Target { get; private set; }
+
         private WebsocketServer websocket;
         private Action<Action> enqueueAction = action => action();
         
@@ -69,6 +71,7 @@ namespace BlocklyBridge
 
         public void SetTarget(IProgrammable programmable)
         {
+            Target = programmable;
             var program = State.GetProgram(programmable.GetGuid());
             WebsocketServer.SendMessage(new JsonMessage("SetTarget", new
             {
@@ -112,12 +115,22 @@ namespace BlocklyBridge
         private void HandleMessage(JObject message)
         {
             string type = (string)message["type"];
-            JObject data = (JObject)message["data"];
+            JObject data = message["data"] as JObject;
             switch (type)
             {
                 case "call": RunMethod(data); break;
                 case "save": SaveCode(data); break;
+                case "test": TestCode(data); break;
                 default: Logger.Warn("Unknown type: " + type); break;
+            }
+        }
+
+        private void TestCode(JObject data)
+        {
+            if (Target == null) return;
+            if (!Target.TryTestCode())
+            {
+                // TODO: Handle failed?
             }
         }
 
