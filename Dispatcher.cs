@@ -36,6 +36,7 @@ namespace BlocklyBridge
         }
 
         public event Action<ProgramState> OnSave;
+        public event Action OnReceiveMinimize;
 
         private Dictionary<string, IProgrammable> programmableMap = new Dictionary<string, IProgrammable>();
 
@@ -82,6 +83,15 @@ namespace BlocklyBridge
             }));
         }
 
+        public void ResizeBlockly(int width, int height)
+        {
+            WebsocketServer.SendMessage(new JsonMessage("Resize", new
+            {
+                width = width,
+                height = height,
+            }));
+        }
+
         private void SyncCode()
         {
             if (websocket == null) return;
@@ -121,6 +131,7 @@ namespace BlocklyBridge
                 case "call": RunMethod(data); break;
                 case "save": SaveCode(data); break;
                 case "test": TestCode(data); break;
+                case "minimize": OnReceiveMinimize.Invoke(); break;
                 default: Logger.Warn("Unknown type: " + type); break;
             }
         }
