@@ -171,7 +171,13 @@ namespace BlocklyBridge
                 return;
             }
 
-            var method = BlocklyGenerator.Call(target, methodName, args);
+            var method = null;
+            try {
+                method = BlocklyGenerator.Call(target, methodName, args);
+            } catch (Exception e) {
+                Logger.Warn("Error executing method: " + methodName);
+            }
+            
             if (method != null) target.EnqueueMethod(method);
             Action onFinished = () =>
             {
