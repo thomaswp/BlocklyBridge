@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 
 namespace BlocklyBridge
 {
@@ -22,12 +22,12 @@ namespace BlocklyBridge
 
         public string ToJSON()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IncludeFields = true });
+            return JsonConvert.SerializeObject(this);
         }
 
         public static ProgramState FromJSON(string json)
         {
-            return (ProgramState)JsonSerializer.Deserialize(json, typeof(ProgramState), new JsonSerializerOptions { IncludeFields = true });
+            return JsonConvert.DeserializeObject<ProgramState>(json);
         }
     }
 
